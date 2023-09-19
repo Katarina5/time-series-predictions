@@ -19,3 +19,8 @@ monthly_count = pd.DataFrame(accidents_df.groupby(accidents_df['date'].dt.to_per
 
 daily_count.to_csv('accidents_daily.csv', header=['y'])
 monthly_count.to_csv('accidents_monthly.csv', header=['y'])
+
+temperatures = pd.read_csv('temperatures_farenheit.csv', index_col=None)
+temperatures['temperature'] = round((temperatures['temperature'] - 32) * 5 / 9, 1)
+daily_count['temperature'] = temperatures['temperature'].values
+daily_count.to_csv('accidents_daily_temp.csv', header=['y', 'temp'])
