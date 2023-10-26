@@ -7,11 +7,6 @@ class Model(ABC):
         super().__init__()
         self.train_df = train_df.copy()  # training data
         self.predict_df = predict_df.copy()  # testing data + future timesteps
-        print("YYYYYYYYYYYYYYYYY")
-        print(self.train_df)
-        print("YYYYYYYYYYYYYYYYYYYYY")
-        print(self.predict_df)
-        print("YYYYYYYYYYYYYYYYYYYYYY")
 
     @abstractmethod
     def preprocess_data(self):

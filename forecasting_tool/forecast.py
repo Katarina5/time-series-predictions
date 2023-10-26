@@ -2,7 +2,7 @@ import argparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_percentage_error
 
 from models.prophet_model import ProphetModel
 from models.arima_model import ArimaModel
@@ -19,7 +19,6 @@ from models.mlp_randomized_model import MlpRandomizedModel
 from models.mlp_grid_model import MlpGridModel
 from models.gnn_model import GnnModel
 from models.transformer_model import TransformerModel
-from models.autots_model import AutoTSModel
 
 
 # create the argument parser
@@ -72,7 +71,6 @@ else:
 
 
 for model_name in models:
-    print("XXXXXXXXXXXXXXXXXXXXXXX " + model_name + " XXXXXXXXXXXXXXXXXXXXXX")
     m = model_dict[model_name]
     m.preprocess_data()
     m.fit()
@@ -88,7 +86,7 @@ dataset_df.tail(days_to_predict)[models].to_csv('results/predictions.csv')
 
 # evaluation
 target_values = dataset_df.tail(test_len + days_to_predict).head(test_len)['y'].values
-rmse_results = {}
+metrics_results = {}
 
 for m in models:
   # get the predicted values for the current model
@@ -100,21 +98,28 @@ for m in models:
   # calculate the RMSE by taking the square root of the MSE
   rmse = np.sqrt(mse)
 
+  # calculate the R2 score
+  r2 = r2_score(target_values, predicted_values)
+
+  # calculate the mean absolute percentage error (MAPE)
+  mape = mean_absolute_percentage_error(target_values, predicted_values)
+
   # store the RMSE value in the dictionary
-  rmse_results[m] = rmse
+  metrics_results[m] = {'RMSE': rmse, 'R2': r2, 'MAPE': mape}
 
 # convert the dictionary to a DataFrame
-rmse_df = pd.DataFrame.from_dict(rmse_results, orient='index', columns=['RMSE'])
-rmse_df.sort_values(by='RMSE')
+metrics_df = pd.DataFrame.from_dict(metrics_results, orient='index', columns=['RMSE', 'R2', 'MAPE'])
+metrics_df.sort_values(by='RMSE', inplace=True)
 
+# set the index name to 'model'
+metrics_df.index.name = 'model'
 # save the RMSE values to a CSV file
-rmse_df.to_csv('results/rmse.csv')
+metrics_df.to_csv('results/metrics.csv')
 
 # plot the model results
 for m in models:
     # do not plot actual values/temperature on their own
     plt.rcParams['figure.figsize'] = [12, 7]
-    print(dataset_df.tail(test_len + days_to_predict)[['y', m]].head(test_len + min(days_to_predict, 14)))
     dataset_df.tail(test_len + days_to_predict)[['y', m]].head(test_len + min(days_to_predict, 14)).plot()
     plt.title('Number of accidents - test set - ' + m)
     plt.xlabel('date')

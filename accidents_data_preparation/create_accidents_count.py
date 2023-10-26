@@ -1,6 +1,5 @@
 import pandas as pd
 import glob
-import re
 
 # concat data from multiple CSVs to a single DataFrame
 df_list = []
@@ -41,4 +40,9 @@ def convert_hour_string_to_decimal(time):
 daylight['daylight'] = daylight['daylight'].apply(convert_hour_string_to_decimal)
 daily_count['daylight'] = daylight['daylight'].values
 
-daily_count.to_csv('accidents_daily.csv', header=['y', 'temp', 'daylight'])
+# add school holidays to the DataFrame
+holidays = pd.read_csv('school_holidays.csv', index_col=None)
+
+daily_count['holiday'] = holidays['holiday'].values
+
+daily_count.to_csv('accidents_daily.csv', header=['y', 'temp', 'daylight', 'holiday'])

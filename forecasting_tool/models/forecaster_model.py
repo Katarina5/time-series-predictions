@@ -21,19 +21,22 @@ class ForecasterModel(Model):
         self.model.generate_future_dates(len(self.predict_df))  # predict for test set as well as for the future
         self.model.set_validation_length(min(365, 0.3 * len(self.train_df)))
 
-        regressor_names = train_df.columns.tolist()
-        regressor_names = [r for r in regressor_names if r not in ['ds', 'y']]
-        for r in regressor_names:
-            self.model.add_series(pd.concat([self.train_df[r], self.predict_df[r]]), called=r)  # add regressor with temperatures
-
 
     def preprocess_data(self):
       pass  # no need to preprocess for Forecaster
   
     def fit(self):
         self.model.auto_Xvar_select()  # automatic selection of the most optimal regressors
+
+        # add other features as regressors
+        regressor_names = self.predict_df.columns.tolist()
+        regressor_names = [r for r in regressor_names if r not in ['ds', 'y']]
+        for r in regressor_names:
+            self.model.add_series(pd.concat([self.train_df[r], self.predict_df[r]]), called=r)
+        
         self.model.tune()  # find optimal hyperparameters for the current model
-  
+
+
     def predict(self):
         self.model.auto_forecast()  # automatic forecasting using the most optimal regressors and hyperparameters
         return self.model.export_fitted_vals(self.model_name)['FittedVals'].tail(len(self.predict_df))
