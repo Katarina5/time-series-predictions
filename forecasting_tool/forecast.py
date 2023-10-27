@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import numpy as np
+import time
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_percentage_error
 
@@ -41,9 +42,12 @@ dataset_df['ds'] = pd.to_datetime(dataset_df['ds'])
 test_len = min(365, 0.3*(len(dataset_df) - days_to_predict))
 
 # crate training and testing DataFrames
-dataset_train = dataset_df.head(len(dataset_df) - test_len - days_to_predict).copy()  #.reset_index()
-dataset_test = dataset_df.tail(test_len + days_to_predict).copy()  # .reset_index()
+dataset_train = dataset_df.head(len(dataset_df) - test_len - days_to_predict).copy()
+dataset_test = dataset_df.tail(test_len + days_to_predict).copy()
 
+# create DataFrame with information about how long models run
+timer_df = pd.DataFrame(columns=['seconds'])
+timer_df.index.name = 'model'
 
 model_dict = {
     'prophet': ProphetModel(train_df=dataset_train, predict_df=dataset_test),
@@ -60,8 +64,7 @@ model_dict = {
     'rf_grid': RandomForestGridModel(train_df=dataset_train, predict_df=dataset_test),
     'mlp_ga': MlpGAModel(train_df=dataset_train, predict_df=dataset_test),
     'mlp_randomized': MlpRandomizedModel(train_df=dataset_train, predict_df=dataset_test),
-    'mlp_grid': MlpGridModel(train_df=dataset_train, predict_df=dataset_test),
-    # 'autots': AutoTSModel(train_df=dataset_train, predict_df=dataset_test)
+    'mlp_grid': MlpGridModel(train_df=dataset_train, predict_df=dataset_test)
 }
 
 if model=='all':
@@ -73,8 +76,11 @@ else:
 for model_name in models:
     m = model_dict[model_name]
     m.preprocess_data()
+    start = time.time()
     m.fit()
     m_forecast = m.predict()
+    end = time.time()
+    timer_df.loc[model_name] = end - start
     dataset_df[model_name] = [None] * len(dataset_train) + list(m_forecast)  # add the forecast to predict_df
 
 
@@ -126,6 +132,9 @@ for m in models:
     plt.ylabel('number of accidents')
     # save the plot to a PNG file
     plt.savefig('results/' + m + '.png')
+
+# save for how long each model was running to a CSV file
+timer_df.to_csv('results/time.csv')
 
 # create plot with all models only if option 'all' is selected
 if model == 'all':
