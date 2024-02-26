@@ -1,8 +1,9 @@
 from models.random_forest_model import RandomForestModel
 from sklearn.ensemble import RandomForestRegressor
 from sklearn_genetic.space import Continuous, Categorical, Integer
-from sklearn_genetic import ExponentialAdapter
-from sklearn_genetic import GASearchCV
+from sklearn_genetic import ExponentialAdapter, GASearchCV
+from sklearn_genetic.plots import plot_fitness_evolution
+import matplotlib.pyplot as plt
 
 
 class RandomForestGAModel(RandomForestModel):
@@ -35,3 +36,12 @@ class RandomForestGAModel(RandomForestModel):
                             n_jobs=-1,
                             error_score='raise'
                             )
+
+  def fit(self):
+    self.model.fit(self.train_df.drop('y', axis=1), self.train_df['y'])  # fit the training data
+
+    # plot the evolution of the fitness function
+    plt.rcParams['figure.figsize'] = [12, 7]
+    plot_fitness_evolution(self.model)
+    plt.savefig('results/rf_ga_fitness_evolution.png', bbox_inches='tight')
+    plt.clf()

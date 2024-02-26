@@ -116,7 +116,7 @@ sgd = {
 }
 
 svr = {
-    'kernel':['linear','rbf', 'sigmoid','poly'],
+    'kernel':['linear','rbf','sigmoid','poly'],
     'C':[.01,.1,.5,1,2,3],
     'epsilon':[0.01,0.1,0.5,1],
     'gamma':['scale','auto'],

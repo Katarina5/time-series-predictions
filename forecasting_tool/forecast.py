@@ -25,7 +25,7 @@ from models.transformer_model import TransformerModel
 # create the argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument('--predict_days', help="How many days to the future to predict.", type=int, default=14)
-parser.add_argument('--data_file', help="File name with dataset located in the same folder.", type=str, default='accidents_daily.csv')
+parser.add_argument('--data_file', help="File name with input dataset. Must be located in the same folder as this tool.", type=str, default='accidents_daily.csv')
 parser.add_argument('--model', help='Which model to use for predictions.', type=str, default='prophet')
 
 args = parser.parse_args()
@@ -122,23 +122,29 @@ metrics_df.index.name = 'model'
 # save the RMSE values to a CSV file
 metrics_df.to_csv('results/metrics.csv')
 
+# rename the column 'y' for plots
+dataset_df.rename(columns={'y': 'original'}, inplace=True)
+
 # plot the model results
 for m in models:
     # do not plot actual values/temperature on their own
     plt.rcParams['figure.figsize'] = [12, 7]
-    dataset_df.tail(test_len + days_to_predict)[['y', m]].head(test_len + min(days_to_predict, 14)).plot()
-    plt.title('Number of accidents - test set - ' + m)
-    plt.xlabel('date')
-    plt.ylabel('number of accidents')
+    dataset_df.tail(test_len + days_to_predict)[['original', m]].head(test_len + min(days_to_predict, 14)).plot()
+    plt.title('Results - test set - ' + m, fontsize=15)
+    plt.xlabel('date', fontsize=13)
+    plt.ylabel('value', fontsize=13)
     # save the plot to a PNG file
-    plt.savefig('results/' + m + '.png')
+    plt.savefig('results/' + m + '.png', bbox_inches='tight')
 
 # save for how long each model was running to a CSV file
 timer_df.to_csv('results/time.csv')
 
 # create plot with all models only if option 'all' is selected
 if model == 'all':
-  dataset_df[models + ['y']].tail(test_len + days_to_predict).head(test_len + min(14, days_to_predict)).plot()
-  plt.title('')
+  plt.rcParams['figure.figsize'] = [12, 7]
+  dataset_df[models + ['original']].tail(test_len + days_to_predict).head(test_len + min(14, days_to_predict)).plot()
+  plt.title('Results - test set - all models', fontsize=15)
+  plt.xlabel('date', fontsize=13)
+  plt.ylabel('value', fontsize=13)
   # save the plot to a PNG file
-  plt.savefig('results/all_models.png')
+  plt.savefig('results/all_models.png', bbox_inches='tight')

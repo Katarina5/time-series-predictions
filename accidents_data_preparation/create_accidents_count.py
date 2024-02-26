@@ -11,7 +11,9 @@ for path in filepaths:
 
 accidents_df = pd.concat(df_list, axis=0, ignore_index=True)
 accidents_df['ds'] = pd.to_datetime(accidents_df[3])
-accidents_df = accidents_df[['ds']]
+accidents_df['deaths'] = accidents_df[13]
+accidents_df['injuries'] = accidents_df[14] + accidents_df[15]
+accidents_df = accidents_df[['ds', 'deaths', 'injuries']]
 
 # create one DataFrame with daily accident counts
 daily_count = pd.DataFrame(accidents_df.groupby(accidents_df['ds'].dt.date)['ds'].count())
@@ -42,7 +44,15 @@ daily_count['daylight'] = daylight['daylight'].values
 
 # add school holidays to the DataFrame
 holidays = pd.read_csv('school_holidays.csv', index_col=None)
-
 daily_count['holiday'] = holidays['holiday'].values
 
 daily_count.to_csv('accidents_daily.csv', header=['y', 'temp', 'daylight', 'holiday'])
+
+
+# create one DataFrame with daily injury counts
+injuries_count = pd.DataFrame(accidents_df.groupby(accidents_df['ds'].dt.date)['injuries'].sum())
+injuries_count = pd.concat([injuries_count, new_rows.set_index('ds')])
+injuries_count['temp'] = daily_count['temperature']
+injuries_count['daylight'] = daily_count['daylight']
+injuries_count['holiday'] = daily_count['holiday']
+injuries_count.to_csv('injuries_daily.csv', header=['y', 'temp', 'daylight', 'holiday'])
