@@ -40,7 +40,6 @@ class MlpGAModel(MlpModel):
     self.model.fit(self.train_df.drop('y', axis=1), self.train_df['y'])  # fit the training data
 
     # plot the evolution of the fitness function
-    plt.rcParams['figure.figsize'] = [12, 7]
     plot_fitness_evolution(self.model)
     plt.savefig('results/mlp_ga_fitness_evolution.png', bbox_inches='tight')
     plt.clf()
