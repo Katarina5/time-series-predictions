@@ -17,12 +17,12 @@ class MlpGAModel(MlpModel):
     crossover_adapter = ExponentialAdapter(initial_value=0.1, end_value=0.9, adaptive_rate=0.1)
 
     ga_search_cv = {
-      "hidden_layer_sizes": Integer(5, 200), 
-      "activation": Categorical(["identity", "logistic", "tanh", "relu"]), 
-      "solver": Categorical(["lbfgs", "sgd", "adam"]), 
-      "alpha": Continuous(0.00005, 0.05),
-      "learning_rate": Categorical(["constant", "invscaling", "adaptive"]),
-      "max_iter": Integer(150, 400)
+      'hidden_layer_sizes': Integer(5, 200), 
+      'activation': Categorical(['identity', 'logistic', 'tanh', 'relu']), 
+      'solver': Categorical(['lbfgs', 'sgd', 'adam']), 
+      'alpha': Continuous(0.00005, 0.05),
+      'learning_rate': Categorical(['constant', 'invscaling', 'adaptive']),
+      'max_iter': Integer(150, 400)
       }
     
     self.model = GASearchCV(estimator=mlp,

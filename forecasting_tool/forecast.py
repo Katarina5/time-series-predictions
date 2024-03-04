@@ -24,9 +24,9 @@ from models.transformer_model import TransformerModel
 
 # create the argument parser
 parser = argparse.ArgumentParser()
-parser.add_argument('--predict_days', help="How many days to the future to predict.", type=int, default=14)
-parser.add_argument('--data_file', help="File name with input dataset. Must be located in the same folder as this tool.", type=str, default='accidents_daily.csv')
-parser.add_argument('--model', help='Which model to use for predictions.', type=str, default='prophet')
+parser.add_argument('--predict_days', help='How many days to the future to predict.', type=int, default=14)
+parser.add_argument('--data_file', help='File name with input dataset. Must be located in the same folder as this tool.', type=str, default='accidents_daily.csv')
+parser.add_argument('--model', help='Which model to use for predictions.', type=str, default='all')
 
 args = parser.parse_args()
 days_to_predict = int(args.predict_days)

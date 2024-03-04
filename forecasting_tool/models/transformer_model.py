@@ -17,12 +17,10 @@ class TransformerModel(Model):
     logger = TensorBoardLogger('lightning_logs')  # logging results to a tensorboard
 
     self.model = pl.Trainer(
-      max_epochs=12,
+      max_epochs=10,
       accelerator='cpu',
       enable_model_summary=True,
       gradient_clip_val=0.1,
-      limit_train_batches=50,  # coment in for training, running valiation every 30 batches
-      # fast_dev_run=True,  # comment in to check that networkor dataset has no serious bugs
       callbacks=[lr_logger, early_stop_callback],
       logger=logger,
     )

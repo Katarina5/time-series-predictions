@@ -10,12 +10,12 @@ class MlpGridModel(MlpModel):
     mlp = MLPRegressor(random_state=111)
 
     grid_search_cv = {
-      "hidden_layer_sizes": [10, 250, 500], 
-      "activation": ["identity", "logistic", "tanh", "relu"], 
-      "solver": ["lbfgs", "sgd", "adam"], 
-      "alpha": [0.00005, 0.005, 0.05],
-      "learning_rate": ["constant", "invscaling", "adaptive"],
-      "max_iter": [150, 300, 400]
+      'hidden_layer_sizes': [10, 250, 500], 
+      'activation': ['identity', 'logistic', 'tanh', 'relu'], 
+      'solver': ['lbfgs', 'sgd', 'adam'], 
+      'alpha': [0.00005, 0.005, 0.05],
+      'learning_rate': ['constant', 'invscaling', 'adaptive'],
+      'max_iter': [150, 300, 400]
     }
     
     self.model = GridSearchCV(estimator=mlp,
