@@ -22,11 +22,28 @@ from models.gnn_model import GnnModel
 from models.transformer_model import TransformerModel
 
 
+# create validation for positive numbers only
+def check_positive(value):
+    if int(value) <= 0:
+        raise argparse.ArgumentTypeError('Value must be >= 1.')
+    return value
+
 # create the argument parser
 parser = argparse.ArgumentParser()
-parser.add_argument('--predict_days', help='How many days to the future to predict.', type=int, default=14)
-parser.add_argument('--data_file', help='File name with input dataset. Must be located in the same folder as this tool.', type=str, default='accidents_daily.csv')
-parser.add_argument('--model', help='Which model to use for predictions.', type=str, default='all')
+parser.add_argument('--predict_days', 
+                    help='How many days to the future to predict, minimum 1.', 
+                    type=check_positive, 
+                    default=14)
+parser.add_argument('--data_file', 
+                    help='File name with input dataset. Must be located in the same folder as this tool.', 
+                    type=str, 
+                    default='accidents_daily.csv')
+parser.add_argument('--model', 
+                    help='Which model to use for predictions.', 
+                    type=str, 
+                    default='all',
+                    choices=['prophet', 'arima', 'svr', 'xgboost', 'catboost', 'gnn', 'transformer', 'rnn', 'lstm', 
+                             'rf_ga', 'rf_randomized', 'rf_grid', 'mlp_ga', 'mlp_randomized', 'mlp_grid', 'all'])
 
 args = parser.parse_args()
 days_to_predict = int(args.predict_days)
